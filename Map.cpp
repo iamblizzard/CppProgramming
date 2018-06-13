@@ -325,7 +325,7 @@ void iter(node *root)
 
 class Map
 {
-	RBTree Tree;
+	RBTree tree;
 public:
 
 	void insert(int);
@@ -336,19 +336,19 @@ public:
 
 void Map::insert(int key)
 {
-	Tree.insert(key);
+	tree.insert(key);
 }
 int Map::find(int key)
 {
-	return traverse(Tree.getRoot(),key);
+	return traverse(tree.getRoot(),key);
 }
 void Map::del(int key)
 {
-	mydel(Tree.getRoot(),key);
+	mydel(tree.getRoot(),key);
 }
 void Map::iterate()
 {
-	iter(Tree.getRoot());
+	iter(tree.getRoot());
 	cout<<endl;
 }
 

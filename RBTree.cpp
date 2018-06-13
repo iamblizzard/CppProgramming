@@ -269,12 +269,12 @@ void RBTree::insert(int n)
 
 int main()
 {
-	RBTree Tree;
+	RBTree tree;
 
 	int n;
 	while(cin>>n)
 	{
-		Tree.insert(n);
+		tree.insert(n);
 	}
 	return 0;
 }
