@@ -8,7 +8,8 @@ struct node
 	Color color;
 	bool leftChild;
 	node *left,*right,*parent;
-}*notify;
+};
+
 node* newNode(int n)
 {
 	node *temp = new node;
@@ -25,21 +26,18 @@ class RBTree
 public:
 	RBTree(): root(NULL) {};
 
-	node* getRoot()
-	{
+	node* getRoot()	{
 		return root;
 	}
 	void insert(int);
 	void check(node *);
 	void rotate(node *);
-	void remove(int);
 };
 
 Color getColor(node* temp)
 {
 	if(temp)
 		return temp->color;
-
 	return BLACK;
 }
 
@@ -91,7 +89,6 @@ void RBTree::rotate(node* temp)
 			parent->leftChild = leftChild;
 
 			final = parent;
-			cout<<final->left->left->data<<" ";
 			break;
 
 		// Left Right case
@@ -267,82 +264,6 @@ void RBTree::insert(int n)
 	check(temp);
 }
 
-node *deleteNode(node *root, int key)
-{
-	if(!root)
-		return NULL;
-
-	node *temp;
-	if(key < root->data)
-	{
-		temp = deleteNode(root->left, key);
-		root->left = temp;
-		if(temp)
-			temp->parent = root;
-	}
-
-	else if(key > root->data)
-	{
-		temp = deleteNode(root->right, key);
-		root->right = temp;
-		if(temp)
-			temp->parent = root;
-	}
-
-	else
-	{
-		int color;
-
-		if(!root->left)
-		{
-			color = (getColor(root) == BLACK);
-			color += (getColor(root->right) == BLACK);
-			node *temp = root->right;
-			free(root);
-
-			if(temp)
-				temp->color = BLACK;
-			if(color == 2)
-				notify = temp;
-
-			return temp;
-		}
-		else if(!root->right)
-		{
-			color = (getColor(root) == BLACK);
-			color += (getColor(root->left) == BLACK);
-			node *temp = root->left;
-			free(root);
-			
-			if(temp)
-				temp->color = BLACK;
-			if(color == 2)
-				notify = temp;
-
-			return temp;
-		}
-		node *temp = root->right;
-		while(temp->left)
-			temp = temp->left;
-
-		root->data = temp->data;
-		temp = deleteNode(root->right, temp->data);
-		root->right = temp;
-		if(temp)
-			temp->parent = root;
-	}
-	return root;
-}
-
-void RBTree::remove(int key)
-{
-	notify = NULL;
-	root = deleteNode(root,key);
-
-	if(notify)
-		cout<<notify->data<<endl;
-}
-
 int main()
 {
 	RBTree tree;
@@ -353,6 +274,5 @@ int main()
 		tree.insert(n);
 	}
 
-	tree.remove(20);
 	return 0;
 }
