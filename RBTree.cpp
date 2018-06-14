@@ -9,6 +9,9 @@ struct node
 	bool leftChild;
 	node *left,*right,*parent;
 }*notify;
+
+bool checkleft;
+
 node* newNode(int n)
 {
 	node *temp = new node;
@@ -25,13 +28,12 @@ class RBTree
 public:
 	RBTree(): root(NULL) {};
 
-	node* getRoot()
-	{
+	node* getRoot() {
 		return root;
 	}
 	void insert(int);
 	void check(node *);
-	void rotate(node *);
+	void rotate(node *,bool);
 	void remove(int);
 };
 
@@ -39,20 +41,144 @@ Color getColor(node* temp)
 {
 	if(temp)
 		return temp->color;
-
 	return BLACK;
 }
 
-void RBTree::rotate(node* temp)
+node *LLRotation(node *temp, bool inserted)
+{
+	bool leftChild;
+	node *parent = temp->parent;
+	node *grandparent = parent->parent;
+
+	node *temp3;
+	//rotation
+	temp3 = parent->right;
+	parent->right = grandparent;
+	grandparent->parent = parent;
+	grandparent->left = temp3;
+	if(temp3)
+		temp3->parent = grandparent;
+
+	//color change
+	if(inserted)
+		parent->color = BLACK, grandparent->color = RED;
+	else
+		temp->color = BLACK;
+
+	//adjust left right value of nodes
+	leftChild = grandparent->leftChild;
+	grandparent->leftChild = false;
+	parent->leftChild = leftChild;
+
+	return parent;
+}
+
+node *LRRotation(node *temp, bool inserted)
 {
 	node *parent = temp->parent;
 	node *grandparent = parent->parent;
-	node *top;
-	node *temp1,*temp2,*temp3,*temp4,*final;
 	bool leftChild;
+	node *temp2,*temp3;
+	//rotation
+	temp2 = temp->left;
+	temp3 = temp->right;
+	temp->left = parent;
+	temp->right = grandparent;
+	grandparent->left = temp3;
+	parent->right = temp2;
+
+	grandparent->parent = temp;
+	parent->parent = temp;
+	if(temp3)
+		temp3->parent = grandparent;
+	if(temp2)
+		temp2->parent = parent;
+
+	//color change
+	if(inserted)
+		grandparent->color = RED, temp->color = BLACK;
+	else
+		temp->color = BLACK;
+
+	//adjust left right value of nodes
+	leftChild = grandparent->leftChild;
+	grandparent->leftChild = false;
+	temp->leftChild = leftChild;
+
+	return temp;
+}
+
+node *RRRotation(node *temp, bool inserted)
+{
+	bool leftChild;
+	node *parent = temp->parent;
+	node *grandparent = parent->parent;
+
+	node *temp3;
+	//rotation
+	temp3 = parent->left;
+	parent->left = grandparent;
+	grandparent->parent = parent;
+	grandparent->right = temp3;
+	if(temp3)
+		temp3->parent = grandparent;
+
+	//color change
+	if(inserted)
+		parent->color = BLACK, grandparent->color = RED;
+	else
+		temp->color = BLACK;
+
+	//adjust left right value of nodes
+	leftChild = grandparent->leftChild;
+	grandparent->leftChild = true;
+	parent->leftChild = leftChild;
+
+	return parent;
+}
+
+node *RLRotation(node *temp, bool inserted)
+{
+	bool leftChild;
+	node *parent = temp->parent;
+	node *grandparent = parent->parent;
+	node *temp3,*temp4;
+	//rotation
+	temp3 = temp->left;
+	temp4 = temp->right;
+	temp->left = grandparent;
+	temp->right = parent;
+	grandparent->right = temp3;
+	parent->left = temp4;
+
+	grandparent->parent = temp;
+	parent->parent = temp;
+	if(temp3)
+		temp3->parent = grandparent;
+	if(temp4)
+		temp4->parent = parent;
+
+	//color change
+	if(inserted)
+		grandparent->color = RED,temp->color = BLACK;
+	else
+		temp->color = BLACK;
+
+	//adjust left right value of nodes
+	leftChild = grandparent->leftChild;
+	grandparent->leftChild = true;
+	temp->leftChild = leftChild;
+
+	return temp;
+}
+
+void RBTree::rotate(node* temp, bool inserted = true)
+{
+	node *top, *final, *grandparent = temp->parent->parent;
+	bool leftChild = grandparent->leftChild;
 	int c=0;
 
-	if(parent->leftChild)
+	if(temp->parent->leftChild)
 	{
 		if(temp->leftChild)
 			c=0;
@@ -73,110 +199,26 @@ void RBTree::rotate(node* temp)
 		// Left Left case
 		case 0:
 
-			//rotation
-			temp3 = parent->right;
-			parent->right = grandparent;
-			grandparent->parent = parent;
-			grandparent->left = temp3;
-			if(temp3)
-				temp3->parent = grandparent;
-
-			//color change
-			parent->color = BLACK;
-			grandparent->color = RED;
-
-			//adjust left right value of nodes
-			leftChild = grandparent->leftChild;
-			grandparent->leftChild = false;
-			parent->leftChild = leftChild;
-
-			final = parent;
-			cout<<final->left->left->data<<" ";
+			final = LLRotation(temp,inserted);
 			break;
 
 		// Left Right case
 		case 1:
 
-			//rotation
-			temp2 = temp->left;
-			temp3 = temp->right;
-			temp->left = parent;
-			temp->right = grandparent;
-			grandparent->left = temp3;
-			parent->right = temp2;
-
-			grandparent->parent = temp;
-			parent->parent = temp;
-			if(temp3)
-				temp3->parent = grandparent;
-			if(temp2)
-				temp2->parent = parent;
-
-			//color change
-			grandparent->color = RED;
-			temp->color = BLACK;
-
-			//adjust left right value of nodes
-			leftChild = grandparent->leftChild;
-			grandparent->leftChild = false;
-			temp->leftChild = leftChild;
-
-			final = temp;
+			final = LRRotation(temp,inserted);
 			break;
 
 		// Right Right case
 		case 2:
 
-			//rotation
-			temp3 = parent->left;
-			parent->left = grandparent;
-			grandparent->parent = parent;
-			grandparent->right = temp3;
-			if(temp3)
-				temp3->parent = grandparent;
-
-			//color change
-			parent->color = BLACK;
-			grandparent->color = RED;
-
-			//adjust left right value of nodes
-			leftChild = grandparent->leftChild;
-			grandparent->leftChild = true;
-			parent->leftChild = leftChild;
-
-			final = parent;
+			final = RRRotation(temp,inserted);
 			break;
 
 		// Right Left case
 		case 3:
 
-			//rotation
-			temp3 = temp->left;
-			temp4 = temp->right;
-			temp->left = grandparent;
-			temp->right = parent;
-			grandparent->right = temp3;
-			parent->left = temp4;
-
-			grandparent->parent = temp;
-			parent->parent = temp;
-			if(temp3)
-				temp3->parent = grandparent;
-			if(temp4)
-				temp4->parent = parent;
-
-			//color change
-			grandparent->color = RED;
-			temp->color = BLACK;
-
-			//adjust left right value of nodes
-			leftChild = grandparent->leftChild;
-			grandparent->leftChild = true;
-			temp->leftChild = leftChild;
-
-			final = temp;
+			final = RLRotation(temp,inserted);
 			break;
-
 	}
 
 	//final touch
@@ -297,13 +339,15 @@ node *deleteNode(node *root, int key)
 		{
 			color = (getColor(root) == BLACK);
 			color += (getColor(root->right) == BLACK);
+
+			if(color == 2)
+				notify = root->parent, checkleft = root->leftChild;
+
 			node *temp = root->right;
 			free(root);
 
 			if(temp)
 				temp->color = BLACK;
-			if(color == 2)
-				notify = temp;
 
 			return temp;
 		}
@@ -311,13 +355,15 @@ node *deleteNode(node *root, int key)
 		{
 			color = (getColor(root) == BLACK);
 			color += (getColor(root->left) == BLACK);
+
+			if(color == 2)
+				notify = root->parent, checkleft = root->leftChild;
+			
 			node *temp = root->left;
 			free(root);
 			
 			if(temp)
 				temp->color = BLACK;
-			if(color == 2)
-				notify = temp;
 
 			return temp;
 		}
@@ -338,10 +384,55 @@ void RBTree::remove(int key)
 {
 	notify = NULL;
 	root = deleteNode(root,key);
+	node *parent,*sibling;
+	int color;
 
-	if(notify)
-		cout<<notify->data<<endl;
+	if(notify == NULL)
+		return;
+
+	parent = notify;
+	if(checkleft)
+		sibling = parent->right;
+	else
+		sibling = parent->left;
+	
+	if(getColor(sibling) == BLACK)
+	{
+		if(sibling)
+			color = getColor(sibling->left) + getColor(sibling->right);
+		else
+			color = 2;
+
+		if(color != 2)
+		{
+			if(getColor(sibling->right) == RED)
+			{
+				cout<<sibling->right->data<<endl;
+				rotate(sibling->right,false);
+			}
+			else
+			{
+				cout<<sibling->left->data<<endl;
+				rotate(sibling->left,false);
+			}
+		}
+	}
 }
+/*
+void traverse(node *temp)
+{
+	if(!temp)
+		return;
+
+	traverse(temp->left);
+	cout<<temp->data<<":";
+	if(temp->color == BLACK)
+		cout<<"B ";
+	else
+		cout<<"R ";
+	traverse(temp->right);
+}
+*/
 
 int main()
 {
@@ -353,6 +444,9 @@ int main()
 		tree.insert(n);
 	}
 
+	//traverse(tree.getRoot());
+	
 	tree.remove(20);
+
 	return 0;
 }
