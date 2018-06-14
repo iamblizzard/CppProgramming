@@ -9,6 +9,7 @@ struct node
 	bool leftChild;
 	node *left,*right,*parent;
 };
+
 node* newNode(int n)
 {
 	node *temp = new node;
@@ -25,8 +26,7 @@ class RBTree
 public:
 	RBTree(): root(NULL) {};
 
-	node* getRoot()
-	{
+	node* getRoot()	{
 		return root;
 	}
 	void insert(int);
@@ -38,7 +38,6 @@ Color getColor(node* temp)
 {
 	if(temp)
 		return temp->color;
-
 	return BLACK;
 }
 
@@ -90,7 +89,6 @@ void RBTree::rotate(node* temp)
 			parent->leftChild = leftChild;
 
 			final = parent;
-			cout<<final->left->left->data<<" ";
 			break;
 
 		// Left Right case
@@ -222,7 +220,6 @@ void RBTree::check(node *temp)
 		rotate(temp);
 }
 
-
 void RBTree::insert(int n)
 {
 	//If first element inserted
@@ -269,12 +266,13 @@ void RBTree::insert(int n)
 
 int main()
 {
-	RBTree Tree;
+	RBTree tree;
 
 	int n;
 	while(cin>>n)
 	{
-		Tree.insert(n);
+		tree.insert(n);
 	}
+
 	return 0;
 }
