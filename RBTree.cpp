@@ -35,6 +35,7 @@ public:
 	void check(node *);
 	void rotate(node *,bool);
 	void remove(int);
+	void removeExt(node *);
 };
 
 Color getColor(node* temp)
@@ -380,15 +381,65 @@ node *deleteNode(node *root, int key)
 	return root;
 }
 
-void RBTree::remove(int key)
+node *LRotate(node *parent)
 {
-	notify = NULL;
-	root = deleteNode(root,key);
-	node *parent,*sibling;
-	int color;
+	node *sibling = parent->left;
+	node *temp = sibling->right;
+	bool leftChild;
 
+	//rotation
+	sibling->right = parent;
+	parent->left = temp;
+
+	parent->parent = sibling;
+	if(temp)
+		temp->parent = parent;
+
+	//color change
+	sibling->color = BLACK;
+	parent->color = RED;
+
+	//adjust left right value of nodes
+	leftChild = parent->leftChild;
+	parent->leftChild = false;
+	sibling->leftChild = leftChild;
+
+	return sibling;
+}
+
+node *RRotate(node *parent)
+{
+	node *sibling = parent->right;
+	node *temp = sibling->left;
+	bool leftChild;
+
+	//rotation
+	sibling->left = parent;
+	parent->right = temp;
+
+	parent->parent = sibling;
+	if(temp)
+		temp->parent = parent;
+
+	//color change
+	sibling->color = BLACK;
+	parent->color = RED;
+
+	//adjust left right value of nodes
+	leftChild = parent->leftChild;
+	parent->leftChild = true;
+	sibling->leftChild = leftChild;
+
+	return sibling;
+}
+
+void RBTree::removeExt(node *notify)
+{
 	if(notify == NULL)
 		return;
+
+	node *parent,*sibling,*temp;
+	int color;
 
 	parent = notify;
 	if(checkleft)
@@ -406,17 +457,57 @@ void RBTree::remove(int key)
 		if(color != 2)
 		{
 			if(getColor(sibling->right) == RED)
-			{
-				cout<<sibling->right->data<<endl;
 				rotate(sibling->right,false);
-			}
 			else
-			{
-				cout<<sibling->left->data<<endl;
 				rotate(sibling->left,false);
+		}
+		//not tested yet
+		else
+		{
+			sibling->color = RED;
+			if(getColor(parent) == RED)
+			{
+				parent->color = BLACK;
+				return;
 			}
+			checkleft = parent->leftChild;
+			removeExt(parent->parent);
 		}
 	}
+	else
+	{
+		temp = parent->parent;
+
+		if(sibling->leftChild)
+			parent = LRotate(parent);
+		else
+			parent = RRotate(parent);
+
+		checkleft = parent->leftChild;
+		if(temp)
+		{
+			if(checkleft)
+				temp->left = parent;
+			else
+				temp->right = parent;
+			parent->parent = temp;
+			removeExt(temp);
+		}
+		else
+		{
+			parent->parent= NULL;
+			root = parent;
+			return;
+		}
+	}
+}
+
+void RBTree::remove(int key)
+{
+	notify = NULL;
+	root = deleteNode(root,key);
+
+	removeExt(notify);
 }
 /*
 void traverse(node *temp)
@@ -433,7 +524,6 @@ void traverse(node *temp)
 	traverse(temp->right);
 }
 */
-
 int main()
 {
 	RBTree tree;
@@ -446,7 +536,8 @@ int main()
 
 	//traverse(tree.getRoot());
 	
-	tree.remove(20);
+	tree.remove(10);
 
+	
 	return 0;
 }
