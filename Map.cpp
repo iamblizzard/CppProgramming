@@ -11,16 +11,21 @@
 using namespace std;
 enum Color { RED, BLACK };
 //structure of each node of a Red-Black Tree
+
+template <class T>
 struct node
 {
-	int data,count;
+	T data;
+	int count;
 	Color color;
 	bool leftChild;
 	node *left,*right,*parent;
 };
-node* newNode(int n)
+
+template <class T>
+node<T>* newNode(T n)
 {
-	node *temp = new node;
+	node<T> *temp = new node<T>;
 	temp->data = n;
 	temp->count = 1;
 	temp->color = RED;
@@ -28,23 +33,26 @@ node* newNode(int n)
 	temp->left = temp->right = temp->parent = NULL;
 	return temp;
 }
+
+template <class T>
 class RBTree
 {
-	node *root;
+	node<T> *root;
 	
 public:
 	RBTree(): root(NULL) {};
 
-	node* getRoot()
+	node<T>* getRoot()
 	{
 		return root;
 	}
-	void insert(int);
-	void check(node *);
-	void rotate(node *);
+	void insert(T);
+	void check(node<T> *);
+	void rotate(node<T> *);
 };
 
-Color getColor(node* temp)
+template <class T>
+Color getColor(node<T>* temp)
 {
 	if(temp)
 		return temp->color;
@@ -52,12 +60,13 @@ Color getColor(node* temp)
 	return BLACK;
 }
 
-void RBTree::rotate(node* temp)
+template <class T>
+void RBTree<T>::rotate(node<T>* temp)
 {
-	node *parent = temp->parent;
-	node *grandparent = parent->parent;
-	node *top;
-	node *temp1,*temp2,*temp3,*temp4,*final;
+	node<T> *parent = temp->parent;
+	node<T> *grandparent = parent->parent;
+	node<T> *top;
+	node<T> *temp1,*temp2,*temp3,*temp4,*final;
 	bool leftChild;
 	int c=0;
 
@@ -100,7 +109,6 @@ void RBTree::rotate(node* temp)
 			parent->leftChild = leftChild;
 
 			final = parent;
-			cout<<final->left->left->data<<" ";
 			break;
 
 		// Left Right case
@@ -204,7 +212,8 @@ void RBTree::rotate(node* temp)
 	}
 }
 
-void RBTree::check(node *temp)
+template <class T>
+void RBTree<T>::check(node<T> *temp)
 {
 	if(temp == root)
 	{
@@ -216,7 +225,7 @@ void RBTree::check(node *temp)
 	if(temp->parent->color == BLACK)
 		return;
 
-	node *uncle,*grandparent = temp->parent->parent;
+	node<T> *uncle,*grandparent = temp->parent->parent;
 	if(temp->parent->leftChild)	
 		uncle = grandparent->right;
 	else
@@ -232,8 +241,8 @@ void RBTree::check(node *temp)
 		rotate(temp);
 }
 
-
-void RBTree::insert(int n)
+template <class T>
+void RBTree<T>::insert(T n)
 {
 	//If first element inserted
 	if(root == NULL)
@@ -244,7 +253,7 @@ void RBTree::insert(int n)
 	}
 
 	//Insert element in BST fashion
-	node *temp=root,*parent;
+	node<T> *temp=root,*parent;
 	while(true)
 	{
 		if(n < temp->data)
@@ -282,7 +291,8 @@ void RBTree::insert(int n)
 	check(temp);
 }
 
-int traverse(node *temp, int key)
+template <class T>
+int traverse(node<T> *temp, T key)
 {
 	if(!temp)
 		return 0;
@@ -296,7 +306,8 @@ int traverse(node *temp, int key)
 	return traverse(temp->right, key);
 }
 
-void mydel(node *temp, int key)
+template <class T>
+void mydel(node<T> *temp, T key)
 {
 	if(!temp)
 		return;
@@ -313,7 +324,8 @@ void mydel(node *temp, int key)
 	mydel(temp->right, key);
 }
 
-void iter(node *root)
+template <class T>
+void iter(node<T> *root)
 {
 	if(!root)
 		return;
@@ -323,30 +335,38 @@ void iter(node *root)
 	iter(root->right);
 }
 
+template <class T>
 class Map
 {
-	RBTree tree;
+	RBTree<T> tree;
 public:
 
-	void insert(int);
-	int find(int);
-	void del(int);
+	void insert(T);
+	int find(T);
+	void del(T);
 	void iterate(void);
 };
 
-void Map::insert(int key)
+template <class T>
+void Map<T>::insert(T key)
 {
 	tree.insert(key);
 }
-int Map::find(int key)
+
+template <class T>
+int Map<T>::find(T key)
 {
 	return traverse(tree.getRoot(),key);
 }
-void Map::del(int key)
+
+template <class T>
+void Map<T>::del(T key)
 {
 	mydel(tree.getRoot(),key);
 }
-void Map::iterate()
+
+template <class T>
+void Map<T>::iterate()
 {
 	iter(tree.getRoot());
 	cout<<endl;
@@ -354,17 +374,33 @@ void Map::iterate()
 
 int main()
 {
-	Map mymap;
+	Map<int> intmap;
 
 	int n;
 	while(cin>>n)
 	{
-		mymap.insert(n);
+		intmap.insert(n);
 	}
-	mymap.del(2);
-	cout<<mymap.find(45345)<<endl;
+	intmap.del(2);
+	cout<<intmap.find(4)<<endl;
 
-	mymap.iterate();
+	intmap.iterate();
+
+	cin.clear();
+
+	Map<char> charmap;
+
+	char c;
+	cin>>c;
+	while(c!='-')
+	{
+		charmap.insert(c);
+		cin>>c;
+	}
+	charmap.del('a');
+	cout<<charmap.find('p')<<endl;
+
+	charmap.iterate();
 
 	return 0;
 }
