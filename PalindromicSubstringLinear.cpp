@@ -1,6 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+// Credits: https://github.com/mission-peace
+
 int main()
 {
 	string s;
@@ -33,7 +35,7 @@ int main()
 				break;
 			}
 		}
-		i 		= new_center;
+		i = new_center;
 		end 	= i + palindrome_length[i]/2;
 		start 	= i - palindrome_length[i]/2;
 	}
